@@ -55,6 +55,7 @@ unsigned int Results_A4[line];
 
 unsigned int i = 0;
 
+/* Prototipos das Funções */
 void Conf_timer(void);
 void Conf_ADC(void);
 void StateMachine(unsigned int SetPoint[line][row]);
