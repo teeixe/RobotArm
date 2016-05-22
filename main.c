@@ -53,8 +53,8 @@ unsigned int Results_A2[line];
 unsigned int Results_A3[line];
 unsigned int Results_A4[line];
 
-unsigned int i = 0;
-unsigned int x = 0;
+unsigned int i = 0;			// Of Analog.
+unsigned int state = 0;		// Of State Machine
 
 /* Prototipos das Funções */
 void Conf_timer(void);
@@ -150,17 +150,29 @@ void Conf_ADC(void){
 
 }
 
-
 void StateMachine(unsigned int SetPoint[line][row]){
 
-	SetTarget[0] = SetPoint[x][0];
+	SetTarget[0] = SetPoint[0][0];
 	MotorCommand_1(SetTarget, Gap);
 
+    switch(state){
+    case 1:
+      __delay_cycles(500000);
+      SetTarget[0] = 300;
+    break;
+    case 2:
+      __delay_cycles(500000);
+      SetTarget[0] = 2000;
+    break;
+    case 3:
+      __delay_cycles(500000);
+      SetTarget[0] = 300;
+    break;
+    default: break;
+    }
 
-	// Altera Posição do SetPoint
-	__delay_cycles(1500000);
-	x++;
-	if (x == line) x = 0;
+    state++;
+    if (state == 3) state = 0;
 
 }
 
