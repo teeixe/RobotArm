@@ -29,20 +29,20 @@
 #define M2ENAB	BIT4
 
 /* Parametros */
-unsigned int SetPoint[line][row] = {{2000, 1800, 2400, 1800, 2000},
-									{2100, 1900, 2500, 1900, 2100},
-									{2200, 2000, 2600, 2000, 2200},
-									{2300, 2100, 2700, 2100, 2300},
-									{2400, 2200, 2800, 2200, 2400},
-									{2500, 2300, 2900, 2300, 2500}};
+unsigned int SetPoint[line][row] = {{300,  1700, 1000, 1000, 1000},
+									{2000, 2200, 1000, 1000, 1000},
+									{300,  1900, 1000, 1000, 1000},
+									{2000, 2300, 1000, 1000, 1000},
+									{300,  1800, 1000, 1000, 1000},
+									{2000, 2000, 1000, 1000, 1000}};
 /* SetPoint Rules
 
    SetPoint[line][row] = {{M1_Step1, M2_Step1, M3_Step1, M4_Step1, M5_Step1},
 						  {M1_Step2, M2_Step2, M3_Step2, M4_Step2, M5_Step2},
 				   		  {M1_StepN, M2_StepN, M3_StepN, M4_StepN, M5_StepN},}; */
 
-unsigned int Gap = 40;			// Gap para a Histerese do Motor
-unsigned int SetTarget;			// Valor para Ajuste do Erro de Posição
+unsigned int Gap = 80;			// Gap para a Histerese do Motor
+unsigned int SetTarget[5];			// Valor para Ajuste do Erro de Posição
 unsigned int SetPointMax;		// Valor Máximo
 unsigned int SetPointMin;		// Valor Minimo
 
@@ -54,12 +54,13 @@ unsigned int Results_A3[line];
 unsigned int Results_A4[line];
 
 unsigned int i = 0;
+unsigned int x = 0;
 
 /* Prototipos das Funções */
 void Conf_timer(void);
 void Conf_ADC(void);
 void StateMachine(unsigned int SetPoint[line][row]);
-void MotorCommand(unsigned int SetTarget, unsigned int Gap);
+void MotorCommand_1(unsigned int SetTarget[line], unsigned int Gap);
 
 int main(void){
 
@@ -152,21 +153,21 @@ void Conf_ADC(void){
 
 void StateMachine(unsigned int SetPoint[line][row]){
 
+	SetTarget[0] = SetPoint[x][0];
+	MotorCommand_1(SetTarget, Gap);
 
-	for(i = 0; i < line; i++){
 
-		SetTarget = SetPoint[i][1];
-		MotorCommand(SetTarget, Gap);
-		__delay_cycles(500000);
-
-	}
+	// Altera Posição do SetPoint
+	__delay_cycles(1500000);
+	x++;
+	if (x == line) x = 0;
 
 }
 
-void MotorCommand(unsigned int SetTarget, unsigned int Gap){
+void MotorCommand_1(unsigned int SetTarget[line], unsigned int Gap){
 
-	SetPointMax = SetTarget + Gap;   // Seta Valor Maximo
-	SetPointMin = SetTarget - Gap;   // Seta Valor Minimo
+	SetPointMax = SetTarget[0] + Gap;   // Seta Valor Maximo
+	SetPointMin = SetTarget[0] - Gap;   // Seta Valor Minimo
 
 	// Girar Sentido Horário
 	if( Results_A0[0] > SetPointMax){
@@ -191,7 +192,6 @@ void MotorCommand(unsigned int SetTarget, unsigned int Gap){
 		P1OUT &= ~BIT3;        // P1.3 OFF
 
 		P1OUT &= ~BIT4;        // P1.4 DISABLE
-
 	}
 }
 
